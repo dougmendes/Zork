@@ -1,0 +1,33 @@
+# Build artifacts
+*.o
+*.obj
+bin/
+build/
+
+# Executables
+*.exe
+*.out
+zork
+
+# IDE files
+.vscode/
+.vs/
+.idea/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+
+# OS files
+.DS_Store
+Thumbs.db
+*~
+
+# Temporary files
+*.swp
+*.log
+*.tmp
+
+# Core dumps
+core
+core.*
