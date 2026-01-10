@@ -1,33 +1,57 @@
 #include <iostream>
 #include "entity.h"
+#include "room.h"
+#include "exit.h"
 
 int main() {
     std::cout << "=================================\n";
-    std::cout << "    Entity Test - Etapa 1\n";
+    std::cout << "  Room and Exit Test - Etapa 2\n";
     std::cout << "=================================\n\n";
     
-    // Test 1: Create entity
-    std::cout << "Test 1: Creating entity...\n";
-    Entity* testEntity = new Entity("Test Room", "A dark laboratory", EntityType::ROOM);
+    // Create rooms
+    Room* lab = new Room("Laboratory", "A dark abandoned laboratory");
+    Room* corridor = new Room("Corridor", "A long corridor with flickering lights");
+    Room* closet = new Room("Closet", "A small storage closet");
     
-    std::cout << "✓ Entity created successfully!\n";
-    std::cout << "  Name: " << testEntity->GetName() << "\n";
-    std::cout << "  Description: " << testEntity->GetDescription() << "\n";
-    std::cout << "  Type: " << static_cast<int>(testEntity->GetType()) << " (ROOM)\n";
+    std::cout << "✓ Created 3 rooms\n\n";
     
-    // Test 2: Check contents (should be empty)
-    std::cout << "\nTest 2: Checking contents...\n";
-    std::cout << "✓ Contents size: " << testEntity->GetContents().size() << " (should be 0)\n";
+    // Create exits
+    Exit* labToNorth = new Exit(Direction::NORTH, lab, corridor);
+    Exit* corridorToSouth = new Exit(Direction::SOUTH, corridor, lab);
+    Exit* corridorToEast = new Exit(Direction::EAST, corridor, closet);
+    Exit* closetToWest = new Exit(Direction::WEST, closet, corridor);
     
-    // Test 3: Call Update (should do nothing but not crash)
-    std::cout << "\nTest 3: Calling Update()...\n";
-    testEntity->Update();
-    std::cout << "✓ Update() called successfully!\n";
+    std::cout << "✓ Created 4 exits\n\n";
     
-    // Test 4: Delete (destructor should be called)
-    std::cout << "\nTest 4: Deleting entity...\n";
-    delete testEntity;
-    std::cout << "✓ Entity deleted successfully!\n";
+    // Add exits to rooms
+    lab->AddExit(labToNorth);
+    corridor->AddExit(corridorToSouth);
+    corridor->AddExit(corridorToEast);
+    closet->AddExit(closetToWest);
+    
+    std::cout << "✓ Added exits to rooms\n\n";
+    
+    // Test navigation
+    std::cout << "--- Laboratory ---\n";
+    std::cout << lab->GetDescription() << "\n";
+    lab->ListExits();
+    
+    std::cout << "\n--- Going north to Corridor ---\n";
+    Exit* exit = lab->GetExit(Direction::NORTH);
+    if (exit) {
+        Room* nextRoom = exit->GetDestination();
+        std::cout << nextRoom->GetDescription() << "\n";
+        nextRoom->ListExits();
+    }
+    
+    // Cleanup
+    delete lab;
+    delete corridor;
+    delete closet;
+    delete labToNorth;
+    delete corridorToSouth;
+    delete corridorToEast;
+    delete closetToWest;
     
     std::cout << "\n=================================\n";
     std::cout << "    ✓ All tests passed!\n";
