@@ -24,7 +24,7 @@ public:
     /**
      * Destructor
      */
-    ~Room();
+    virtual ~Room();
 
     /**
      * Adds an exit to the room.
