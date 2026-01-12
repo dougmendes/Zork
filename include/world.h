@@ -5,10 +5,11 @@
 #include "room.h"
 #include "exit.h"
 #include "item.h"
-#include "player.h"
 #include <vector>
 #include <string>
 
+// Forward declaration
+class Player; 
 
 /**
  * * World class - manages the entire game world
@@ -53,11 +54,6 @@ public:
     virtual ~World();
 
     /**
-     * Start the game loop
-     */
-    void StartGame();
-
-    /**
      * Add entity to world
      * World takes ownership and will delete it
      * @param entity Entity to add
@@ -90,6 +86,12 @@ public:
      * Update all entities (call Update() on each)
      */
     void Update();
+
+    /**
+     * Trigger game over
+     * @param reason Reason for game over
+     */
+    void GameOver(const std::string& reason);
 
 };
 
