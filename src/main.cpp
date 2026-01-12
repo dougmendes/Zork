@@ -3,109 +3,105 @@
 #include "room.h"
 #include "exit.h"
 #include "item.h"
+#include "creature.h"
+#include "player.h"
 
 int main() {
     std::cout << "=================================\n";
-    std::cout << "   Item and Container Test\n";
+    std::cout << "  Creature and Player Test\n";
     std::cout << "=================================\n\n";
     
-    // Test 1: Create simple items
-    std::cout << "Test 1: Creating items...\n";
-    Item* key = new Item("Rusty Key", "An old rusty key", false, false);
-    Item* sword = new Item("Iron Sword", "A sharp iron sword", true, false);
+    // Test 1: Create rooms
+    std::cout << "Test 1: Creating rooms...\n";
+    Room* lab = new Room("Laboratory", "A dark laboratory");
+    Room* corridor = new Room("Corridor", "A long corridor");
     
-    std::cout << "✓ Created: " << key->GetName() << "\n";
-    std::cout << "✓ Created: " << sword->GetName() 
-              << (sword->IsEquippable() ? " (equippable)" : "") << "\n\n";
+    // Create exits
+    Exit* labNorth = new Exit(Direction::NORTH, lab, corridor);
+    Exit* corridorSouth = new Exit(Direction::SOUTH, corridor, lab);
     
-    // Test 2: Create container
-    std::cout << "Test 2: Creating container...\n";
-    Item* backpack = new Item("Backpack", "A leather backpack", false, true, 5);
+    lab->AddExit(labNorth);
+    corridor->AddExit(corridorSouth);
     
-    std::cout << "✓ Created: " << backpack->GetName() 
-              << (backpack->IsContainer() ? " (container)" : "") << "\n";
-    std::cout << "  Max capacity: " << backpack->GetMaxCapacity() << "\n\n";
+    std::cout << "✓ Created 2 connected rooms\n\n";
     
-    // Test 3: Put items in container
-    std::cout << "Test 3: Putting items in backpack...\n";
-    if (backpack->PutItem(key)) {
-        std::cout << "✓ Put " << key->GetName() << " in backpack\n";
-    }
-    if (backpack->PutItem(sword)) {
-        std::cout << "✓ Put " << sword->GetName() << " in backpack\n";
-    }
-    
-    backpack->ListContents();
-    std::cout << "\n";
-    
-    // Test 4: Nested containers
-    std::cout << "Test 4: Creating nested containers...\n";
-    Item* box = new Item("Small Box", "A small wooden box", false, true, 2);
+    // Test 2: Create items in lab
+    std::cout << "Test 2: Creating items in lab...\n";
+    Item* key = new Item("Rusty Key", "An old key", false, false);
+    Item* sword = new Item("Iron Sword", "A sharp sword", true, false);
     Item* potion = new Item("Health Potion", "Restores 50 HP", false, false);
     
-    box->PutItem(potion);
-    std::cout << "✓ Put potion in box\n";
+    lab->AddEntity(key);
+    lab->AddEntity(sword);
+    lab->AddEntity(potion);
     
-    backpack->PutItem(box);
-    std::cout << "✓ Put box in backpack\n";
+    std::cout << "✓ Added 3 items to laboratory\n\n";
     
-    std::cout << "\nBackpack contents:\n";
-    backpack->ListContents();
+    // Test 3: Create player
+    std::cout << "Test 3: Creating player...\n";
+    Player* player = new Player("Hero", "A brave adventurer", 100);
+    player->SetLocation(lab);
     
-    std::cout << "\nBox contents:\n";
-    box->ListContents();
+    std::cout << "✓ Created player with " << player->GetHP() << " HP\n";
+    std::cout << "  Location: " << player->GetLocation()->GetName() << "\n\n";
+    
+    // Test 4: Pick up items
+    std::cout << "Test 4: Picking up items...\n";
+    player->PickUp("Iron Sword");
+    player->PickUp("Rusty Key");
+    player->PickUp("Health Potion");
+    
+    std::cout << "\n";
+    player->ListInventory();
     std::cout << "\n";
     
-    // Test 5: Take item from container
-    std::cout << "Test 5: Taking item from container...\n";
-    Item* takenKey = backpack->TakeItem("Rusty Key");
-    if (takenKey) {
-        std::cout << "✓ Took " << takenKey->GetName() << " from backpack\n";
-    }
-    
-    std::cout << "\nBackpack contents after taking key:\n";
-    backpack->ListContents();
+    // Test 5: Equip item
+    std::cout << "Test 5: Equipping sword...\n";
+    player->Equip("Iron Sword");
+    std::cout << "\n";
+    player->ListInventory();
     std::cout << "\n";
     
-    // Test 6: Try to put item in non-container
-    std::cout << "Test 6: Trying to put item in non-container...\n";
-    if (!sword->PutItem(key)) {
-        std::cout << "✓ Correctly prevented putting item in non-container\n\n";
-    }
+    // Test 6: Move to another room
+    std::cout << "Test 6: Moving north...\n";
+    player->Move(Direction::NORTH);
+    std::cout << "  Current location: " << player->GetLocation()->GetName() << "\n\n";
     
-    // Test 7: Equipping items
-    std::cout << "Test 7: Equipping items...\n";
-    if (sword->IsEquippable()) {
-        sword->SetEquipped(true);
-        std::cout << "✓ Equipped " << sword->GetName() << "\n";
-        std::cout << "  Is equipped: " << (sword->IsEquipped() ? "yes" : "no") << "\n\n";
-    }
+    // Test 7: Drop item
+    std::cout << "Test 7: Dropping key...\n";
+    player->Drop("Rusty Key");
+    std::cout << "\n";
+    player->ListInventory();
+    std::cout << "\n";
     
-    // Test 8: Capacity limit
-    std::cout << "Test 8: Testing capacity limit...\n";
-    Item* smallBag = new Item("Small Pouch", "Holds only 2 items", false, true, 2);
-    Item* item1 = new Item("Item 1", "First item", false, false);
-    Item* item2 = new Item("Item 2", "Second item", false, false);
-    Item* item3 = new Item("Item 3", "Third item", false, false);
+    // Test 8: Take damage and heal
+    std::cout << "Test 8: Taking damage and healing...\n";
+    std::cout << "HP before: " << player->GetHP() << "/" << player->GetMaxHP() << "\n";
     
-    smallBag->PutItem(item1);
-    smallBag->PutItem(item2);
-    std::cout << "✓ Added 2 items to pouch (capacity: 2)\n";
+    player->TakeDamage(30);
+    std::cout << "HP after damage: " << player->GetHP() << "/" << player->GetMaxHP() << "\n";
     
-    if (!smallBag->PutItem(item3)) {
-        std::cout << "✓ Correctly prevented adding 3rd item (full)\n\n";
-    }
+    player->Heal(20);
+    std::cout << "HP after heal: " << player->GetHP() << "/" << player->GetMaxHP() << "\n";
+    
+    std::cout << "Is alive: " << (player->IsAlive() ? "yes" : "no") << "\n\n";
+    
+    // Test 9: Unequip
+    std::cout << "Test 9: Unequipping sword...\n";
+    player->Unequip();
+    std::cout << "\n";
+    player->ListInventory();
+    std::cout << "\n";
     
     // Cleanup
+    delete player;
+    delete lab;
+    delete corridor;
+    delete labNorth;
+    delete corridorSouth;
     delete key;
     delete sword;
-    delete backpack;
-    delete box;
     delete potion;
-    delete smallBag;
-    delete item1;
-    delete item2;
-    delete item3;
     
     std::cout << "=================================\n";
     std::cout << "    ✓ All tests passed!\n";
