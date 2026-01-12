@@ -118,7 +118,7 @@ void World::Initialize() {
     AddEntity(corridorToWest1);
     AddEntity(lockerToEast);
     
-    // Corridor -> Contaminated Lab 
+    // Corridor -> Contaminated Lab  (Up)
     Exit* corridorToUp = new Exit(Direction::UP, corridor, contaminated);
     Exit* contaminatedToDown = new Exit(Direction::DOWN, contaminated, corridor);
     
@@ -380,6 +380,57 @@ void World::ParseCommand(const std::string& input) {
             player->Equip(itemName);
         }
     }
+    // Quit/Exit
+    else if (command == "exit") {
+    // Check if trying to exit with password
+    std::string password;
+    iss >> password;
+    
+    // If no password provided, just quit
+    if (password.empty()) {
+        gameRunning = false;
+        return;
+    }
+    
+    // Trying to use exit door with password
+    if (player->GetLocation()->GetName() != "Main Corridor") {
+        std::cout << "You need to be at the exit door to use the password.\n";
+        return;
+    }
+    
+    std::cout << "\nYou approach the EXIT door.\n";
+    std::cout << "A digital panel glows: [____]\n";
+    std::cout << "You enter: " << password << "\n\n";
+    
+    // Check password
+    if (password == "0412") {
+        // VICTORY!
+        std::cout << "===========================================\n";
+        std::cout << "           *** SUCCESS! ***\n";
+        std::cout << "===========================================\n\n";
+        std::cout << "The panel beeps and turns GREEN!\n";
+        std::cout << "The heavy door slides open with a hiss.\n\n";
+        std::cout << "Sunlight floods in. You're FREE!\n\n";
+        std::cout << "You stumble out of the laboratory into the fresh air.\n";
+        std::cout << "Behind you, alarms start blaring.\n";
+        std::cout << "You run and don't look back.\n\n";
+        std::cout << "===========================================\n";
+        std::cout << "        YOU ESCAPED THE LABORATORY!\n";
+        std::cout << "===========================================\n\n";
+        
+        gameRunning = false;
+    } else {
+        // Wrong password
+        std::cout << "*** BEEP BEEP BEEP ***\n";
+        std::cout << "The panel flashes RED!\n";
+        std::cout << "INCORRECT PASSWORD.\n\n";
+        
+        if (!player->HasAllPasswordDigits()) {
+            std::cout << "Hint: You need to find all 4 digits first.\n";
+            std::cout << "Explore the rooms and READ the items carefully.\n";
+        }
+    }
+}
     // Unequip
     else if (command == "unequip" || command == "unwield") {
         player->Unequip();
@@ -402,15 +453,95 @@ void World::ParseCommand(const std::string& input) {
     else if (command == "help" || command == "h" || command == "?") {
         ShowHelp();
     }
-    // Quit
-    else if (command == "quit" || command == "exit" || command == "q") {
+    // Quit game
+    else if (command == "quit" || command == "q") {
         gameRunning = false;
     }
+    // Unlock command (for containment room door)
+    else if (command == "unlock" || command == "break" || command == "force") {
+    if (player->GetLocation()->GetName() != "Main Corridor") {
+        std::cout << "There's nothing to unlock here.\n";
+        return;
+    }
+
+    
+    // Check if has axe equipped
+    Item* equipped = player->GetEquippedItem();
+    if (equipped == nullptr || equipped->GetName() != "axe") {
+        std::cout << "You need something to force the door open.\n";
+        std::cout << "The door is jammed and won't budge with bare hands.\n";
+        return;
+    }
+    
+    // Find the locked exit
+    Exit* lockedExit = player->GetLocation()->GetExit(Direction::DOWN);
+    if (lockedExit == nullptr) {
+        std::cout << "There's no door to unlock here.\n";
+        return;
+    }
+    
+    if (!lockedExit->IsLocked()) {
+        std::cout << "The door is already open.\n";
+        return;
+    }
+    
+    // Unlock it!
+    lockedExit->SetLocked(false);
+    std::cout << "\n*** CRACK! ***\n";
+    std::cout << "You jam the axe into the door frame and force it open!\n";
+    std::cout << "The containment room door swings open with a loud creak.\n";
+    std::cout << "You hear heavy breathing coming from inside...\n\n";
+    }
+    // Read command (to discover password digits)
+    else if (command == "read" || command == "examine" || command == "inspect") {
+    std::string itemName;
+    std::getline(iss, itemName);
+    itemName.erase(0, itemName.find_first_not_of(" \t"));
+    
+    if (itemName.empty()) {
+        std::cout << "Read what?\n";
+        return;
+    }
+    
+    // Check if item is in inventory
+    Item* item = player->FindItemInInventory(itemName);
+    
+    // If not in inventory, check current room
+    if (item == nullptr) {
+        Entity* entity = player->GetLocation()->FindEntity(itemName);
+        if (entity != nullptr && entity->GetType() == EntityType::ITEM) {
+            item = static_cast<Item*>(entity);
+        }
+    }
+    
+    if (item == nullptr) {
+        std::cout << "You don't see any " << itemName << " here.\n";
+        return;
+    }
+    
+    // Show item description
+    std::cout << item->GetDescription() << "\n";
+    
+    // Check for password digits
+    std::string name = item->GetName();
+    if (name == "card") {
+        player->AddPasswordDigit(0);
+    } else if (name == "computer") {
+        player->AddPasswordDigit(4);
+    } else if (name == "axe") {
+        player->AddPasswordDigit(1);
+    } else if (name == "photo") {
+        player->AddPasswordDigit(1);
+        player->AddPasswordDigit(2);
+    }
+}
     // Unknown command
     else {
         std::cout << "Unknown command. Type 'help' for available commands.\n";
     }
 }
+
+
 
 // Look around current room
 void World::LookAround() {
@@ -449,12 +580,15 @@ void World::ShowHelp() {
     std::cout << "  look/l - Look around\n";
     std::cout << "  take <item> - Pick up an item\n";
     std::cout << "  drop <item> - Drop an item\n";
+    std::cout << "  read <item> - Read/examine an item\n";         // ← ADICIONAR
     std::cout << "  inventory/i - Show inventory\n";
     std::cout << "  equip <item> - Equip an item\n";
     std::cout << "  unequip - Unequip current item\n";
-    std::cout << "  light - Turn on lights (if available)\n";  // ← ADICIONAR
+    std::cout << "  light - Turn on lights (if available)\n";
+    std::cout << "  unlock - Force open a jammed door (needs axe)\n";  // ← ADICIONAR
     std::cout << "Other:\n";
     std::cout << "  help/h - Show this help\n";
+    std::cout << "  exit <password> - Try to exit (needs 4-digit code)\n";  // ← MODIFICAR
     std::cout << "  quit/q - Quit game\n";
 }
 // Update all entities
