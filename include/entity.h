@@ -60,6 +60,26 @@ public:
     const std::list<Entity*>& GetContents() const;
 
     /**
+    * Add entity to contents
+    * @param entity Entity to add
+    */
+    void AddEntity(Entity* entity);
+
+    /**
+    * Remove entity from contents
+    * @param entity Entity to remove
+    * @return true if removed, false if not found
+    */
+    bool RemoveEntity(Entity* entity);
+
+    /**
+    * Find entity in contents by name
+    * @param name Name to search for
+    * @return Pointer to entity if found, nullptr otherwise
+    */
+    Entity* FindEntity(const std::string& name) const;
+    
+    /**
      * Virtual update method - called each game loop
      * Override in derived classes to implement entity-specific behavior
      */
