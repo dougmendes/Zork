@@ -6,7 +6,7 @@
 /** 
  * Item class - represents a collectable/usable item.
  * Inherits from Entity.
- * Itens can be:
+ * Items can be:
  * - Equippable (weapons, armor, tools )
  * - Used (consumables)
  * - Containers (can hold other items)
