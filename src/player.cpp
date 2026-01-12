@@ -10,7 +10,7 @@ Player::Player(const std::string& name,
     : Creature(name, description, hp),
       equippedItem(nullptr),
       lightOn(false),
-      world(nullptr) {
+      world(nullptr){
 }
 
 // Destructor
@@ -225,4 +225,23 @@ bool Player::Move(Direction direction) {
     }
     
     return true;
+}
+
+void Player::AddPasswordDigit(int digit) {
+    // no duplicates
+    for (int d : passwordDigits) {
+        if (d == digit) {
+            return;
+        }
+    }
+    passwordDigits.push_back(digit);
+    std::cout << "You memorize the digit: " << digit << "\n";
+}
+
+const std::vector<int>& Player::GetPasswordDigits() const {
+    return passwordDigits;
+}
+
+bool Player::HasAllPasswordDigits() const {
+    return passwordDigits.size() >= 4;
 }

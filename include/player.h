@@ -23,6 +23,7 @@ private:
     Item* equippedItem;            // Currently equipped item
     bool lightOn;                 // Control if the player has the light on at room 1D
     class World* world;           // Reference to the game world (for game over triggers)
+    std::vector<int> passwordDigits; // Store password digits collected
 
 public:
     /**
@@ -107,6 +108,23 @@ public:
      */
     void SetWorld(class World* world);
 
+    /**
+     * Add password digit
+     * @param digit Digit to add ( 0-9 )
+     */
+    void AddPasswordDigit(int digit);
+
+    /**
+     * Get collected password digits
+     * @return Vector of collected digits
+     */
+    const std::vector<int>& GetPasswordDigits() const;
+
+    /**
+    * Check if has all 4 password digits
+    * @return true if has 4 digits
+    */
+    bool HasAllPasswordDigits() const;
 };
 
 #endif // PLAYER_H
