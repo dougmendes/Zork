@@ -8,7 +8,9 @@ Player::Player(const std::string& name,
                const std::string& description, 
                int hp)
     : Creature(name, description, hp),
-      equippedItem(nullptr) {
+      equippedItem(nullptr),
+      lightOn(false),
+      world(nullptr) {
 }
 
 // Destructor
@@ -152,4 +154,75 @@ void Player::ListInventory() const {
         }
         std::cout << "\n";
     }
+}
+
+void Player::SetLightOn(bool on) {
+    lightOn = on;
+}
+
+bool Player::AreLightsOn() {
+    return lightOn;
+}
+
+void Player::SetWorld(World* world) {
+    this->world = world;
+}
+
+bool Player::Move(Direction direction) {
+    // Call base class move
+    if (!Creature::Move(direction)) {
+        return false;
+    }
+    
+    // Check special room triggers after moving
+    if (location == nullptr) {
+        return true;
+    }
+    
+    std::string roomName = location->GetName();
+    
+    // ==========================================
+    // TRIGGER: Contaminated Lab (Sala 2L)
+    // ==========================================
+    if (roomName == "Contaminated Lab") {
+        // Check if wearing hazmat suit
+        bool hasHazmat = false;
+        
+        if (equippedItem != nullptr && equippedItem->GetName() == "hazmat") {
+            hasHazmat = true;
+        }
+        
+        if (!hasHazmat) {
+            std::cout << "\n*** You step into the toxic air! ***\n";
+            std::cout << "The air burns your lungs!\n";
+            std::cout << "You needed protective equipment!\n";
+            
+            if (world != nullptr) {
+                world->GameOver("You were poisoned by toxic gas.");
+            }
+            return false;
+        } else {
+            std::cout << "\nThe hazmat suit protects you from the toxic air.\n";
+        }
+    }
+    
+    // ==========================================
+    // TRIGGER: Analysis Lab (Sala 1D)
+    // ==========================================
+    if (roomName == "Analysis Lab") {
+        if (!lightOn) {
+            std::cout << "\n*** CRUNCH! ***\n";
+            std::cout << "You stepped on broken glass tubes in the dark!\n";
+            std::cout << "Unknown chemicals burn through your skin!\n";
+            
+            if (world != nullptr) {
+                world->GameOver("You were poisoned by unknown chemicals.");
+            }
+            return false;
+        } else {
+            std::cout << "\nWith the lights on, you carefully avoid the broken glass.\n";
+        }
+    }
+    
+    return true;
 }

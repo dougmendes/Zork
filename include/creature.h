@@ -66,7 +66,7 @@ public:
      * @param direction Direction to move
      * @return true if move successful, false otherwise
      */
-    bool Move(Direction direction);
+    virtual bool Move(Direction direction);
 };
 
 #endif // CREATURE_H

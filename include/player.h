@@ -3,7 +3,9 @@
 
 #include "creature.h"
 #include "item.h"
+#include "world.h"
 #include <vector>
+#include <iostream>
 
 /**
  * Player class - represents the player character
@@ -19,6 +21,8 @@ class Player : public Creature {
 private:
     std::vector<Item*> inventory;  // Items carried by player
     Item* equippedItem;            // Currently equipped item
+    bool lightOn;                 // Control if the player has the light on at room 1D
+    class World* world;           // Reference to the game world (for game over triggers)
 
 public:
     /**
@@ -86,6 +90,23 @@ public:
      * List all items in inventory
      */
     void ListInventory() const;
+
+    // Set light on for analysis lab
+    void SetLightOn(bool on);
+
+    // Check if lights are on
+    bool AreLightsOn();
+
+    /**
+     * Override Move to add special room checks
+     */
+    bool Move(Direction direction) override;
+
+    /**
+     * Set world reference (needed for game over triggers)
+     */
+    void SetWorld(class World* world);
+
 };
 
 #endif // PLAYER_H
