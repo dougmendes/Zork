@@ -36,56 +36,226 @@ Player* World::GetPlayer() const {
 
 // Initialize world
 void World::Initialize() {
-    std::cout << "Initializing game world...\n";
+    //---------------------------------
+    // ROOMS
+    //---------------------------------
+
+    //Starting room - where the player wakes up
+    Room* labStart = new Room(
+        "Starting room",
+        "You wake up on a gurney in a dimly lit room. The lights flicker.\n"
+        "Your wrists, ankles and neck were tied down, but your right hand is loose.\n"
+        "Medical instruments lie on a small table to your left."
+    );
     
-    // Create rooms
-    Room* lab = new Room("Laboratory", "A dark abandoned laboratory with flickering lights.");
-    Room* corridor = new Room("Corridor", "A long corridor with concrete walls.");
-    Room* storage = new Room("Storage Room", "A small storage room filled with old equipment.");
+    // Main corridor
+    Room* corridor = new Room(
+        "Main Corridor",
+        "A long corridor with 5 doors. Two on the left, two on the right,\n"
+        "and one at the end marked 'EXIT' with a digital panel.\n"
+        "You hear distant footsteps coming from one of the rooms on the right."
+    );
+
+    // Room 1L - Locker Room
+    Room* locker = new Room(
+        "Locker Room",
+        "A locker room where scientists change clothes.\n"
+        "You see lockers with lab coats and protective equipment."
+    );
+
+    // Room 2L - Contamined Room
+    Room* contaminated = new Room(
+        "Contaminated Lab",
+        "Through the window you see scientists collapsed near the door,\n"
+        "wearing protective suits. The air looks thick and toxic.\n"
+        "WARNING: DO NOT ENTER WITHOUT PROTECTION!"
+    );
     
-    AddEntity(lab);
+    //Room 1D - Analysis Lab
+    Room* analysis = new Room(
+        "Analysis Lab",
+        "The door is ajar, lights flickering. You can't see clearly inside.\n"
+        "Broken glass tubes litter the floor."
+    );
+
+    // Room 2D - Containment Room
+    Room* containment = new Room(
+        "Containment Room",
+        "The door is jammed, only opening 5cm.\n"
+        "You need something to force it open."
+    );
+
+    AddEntity(labStart);
     AddEntity(corridor);
-    AddEntity(storage);
+    AddEntity(locker);
+    AddEntity(contaminated);
+    AddEntity(analysis);
+    AddEntity(containment);
     
-    // Create exits
-    Exit* labToNorth = new Exit(Direction::NORTH, lab, corridor);
-    Exit* corridorToSouth = new Exit(Direction::SOUTH, corridor, lab);
-    Exit* corridorToEast = new Exit(Direction::EAST, corridor, storage);
-    Exit* storageToWest = new Exit(Direction::WEST, storage, corridor);
-    
-    lab->AddExit(labToNorth);
+    //---------------------------------
+    // EXITS
+    //---------------------------------
+
+    // Lab Start -> Corridor (North)
+    Exit* startToNorth = new Exit(Direction::NORTH, labStart, corridor);
+    Exit* corridorToSouth = new Exit(Direction::SOUTH, corridor, labStart);
+
+    labStart->AddExit(startToNorth);
     corridor->AddExit(corridorToSouth);
-    corridor->AddExit(corridorToEast);
-    storage->AddExit(storageToWest);
-    
-    AddEntity(labToNorth);
+
+    AddEntity(startToNorth);
     AddEntity(corridorToSouth);
-    AddEntity(corridorToEast);
-    AddEntity(storageToWest);
+
+    // Corridor -> Locker Room (West)
+    Exit* corridorToWest1 = new Exit(Direction::WEST, corridor, locker);
+    Exit* lockerToEast = new Exit(Direction::EAST, locker, corridor);
     
-    // Create items
-    Item* key = new Item("key", "A rusty old key", false, false);
-    Item* flashlight = new Item("flashlight", "A heavy flashlight", true, false);
-    Item* backpack = new Item("backpack", "A sturdy backpack", false, true, 5);
-    Item* note = new Item("note", "A crumpled note with strange symbols", false, false);
+    corridor->AddExit(corridorToWest1);
+    locker->AddExit(lockerToEast);
+        
+    AddEntity(corridorToWest1);
+    AddEntity(lockerToEast);
     
-    // Place items in rooms
-    lab->AddEntity(key);
-    lab->AddEntity(flashlight);
-    corridor->AddEntity(backpack);
-    storage->AddEntity(note);
+    // Corridor -> Contaminated Lab 
+    Exit* corridorToUp = new Exit(Direction::UP, corridor, contaminated);
+    Exit* contaminatedToDown = new Exit(Direction::DOWN, contaminated, corridor);
     
-    AddEntity(key);
-    AddEntity(flashlight);
-    AddEntity(backpack);
-    AddEntity(note);
+    corridor->AddExit(corridorToUp);
+    contaminated->AddExit(contaminatedToDown);
     
-    // Create player
-    Player* hero = new Player("Hero", "A brave adventurer", 100);
-    hero->SetLocation(lab);
+    AddEntity(corridorToUp);
+    AddEntity(contaminatedToDown);
+
+    // Corridor -> Analysis Lab (EAST)
+    Exit* corridorToEast1 = new Exit(Direction::EAST, corridor, analysis);
+    Exit* analysisToWest = new Exit(Direction::WEST, analysis, corridor);
+    
+    corridor->AddExit(corridorToEast1);
+    analysis->AddExit(analysisToWest);
+    
+    AddEntity(corridorToEast1);
+    AddEntity(analysisToWest);
+
+    // Analysis Lab -> Containment Room (West)
+    // This door is locked initially
+    Exit* corridorToContainment = new Exit(Direction::DOWN, corridor, containment);
+    Exit* containmentToCorridor = new Exit(Direction::UP, containment, corridor);
+    
+    // Lock the door - need the axe to open
+    corridorToContainment->SetLocked(true);
+    
+    corridor->AddExit(corridorToContainment);
+    containment->AddExit(containmentToCorridor);
+    
+    AddEntity(corridorToContainment);
+    AddEntity(containmentToCorridor);
+    
+// ==========================================
+    // ITEMS - Starting Room
+    // ==========================================
+    
+    Item* scalpel = new Item("scalpel", "A sharp surgical scalpel", false, false);
+    Item* gauze = new Item("gauze", "Medical gauze", false, false);
+    Item* alcohol = new Item("alcohol", "Disinfecting alcohol", false, false);
+    Item* tape = new Item("tape", "Medical tape", false, false);
+    Item* painkillers = new Item("painkillers", "Pain relief pills", false, false);
+    
+    labStart->AddEntity(scalpel);
+    labStart->AddEntity(gauze);
+    labStart->AddEntity(alcohol);
+    labStart->AddEntity(tape);
+    labStart->AddEntity(painkillers);
+    
+    AddEntity(scalpel);
+    AddEntity(gauze);
+    AddEntity(alcohol);
+    AddEntity(tape);
+    AddEntity(painkillers);
+    
+    // ==========================================
+    // ITEMS - Locker Room (1L)
+    // ==========================================
+    
+    Item* hazmatSuit = new Item(
+        "hazmat", 
+        "A yellow hazmat suit with a gas mask. Protects against toxic environments.",
+        true,   // equippable
+        false   // not a container
+    );
+    
+    Item* accessCard = new Item(
+        "card",
+        "An access card. On the back it says: 'Digit 1: 0'",
+        false,
+        false
+    );
+    
+    locker->AddEntity(hazmatSuit);
+    locker->AddEntity(accessCard);
+    
+    AddEntity(hazmatSuit);
+    AddEntity(accessCard);
+    
+    // ==========================================
+    // ITEMS - Contaminated Lab (2L)
+    // ==========================================
+    
+    Item* computer = new Item(
+        "computer",
+        "A computer with a report: 'SUBJECT #4: Genetic hybrid. CONTAINMENT BREACHED.'\n"
+        "A sticky note on the keyboard says: 'Digit 2: 4'",
+        false,
+        false
+    );
+    
+    contaminated->AddEntity(computer);
+    AddEntity(computer);
+    
+    // ==========================================
+    // ITEMS - Analysis Lab (1D)
+    // ==========================================
+    
+    Item* axe = new Item(
+        "axe",
+        "A fire axe covered in blood. Near it, the number '1' is written in blood on the wall.",
+        true,   // equippable
+        false
+    );
+    
+    analysis->AddEntity(axe);
+    AddEntity(axe);
+    
+    // ==========================================
+    // ITEMS - Containment Room (2D)
+    // ==========================================
+    
+    Item* photo = new Item(
+        "photo",
+        "A photo of scientists in front of 'LABORATORY 2'.\n"
+        "A document on the table says: 'Digit 3: 1'\n"
+        "The number '2' is scratched deeply into the wall. (Digit 4: 2)",
+        false,
+        false
+    );
+    
+    containment->AddEntity(photo);
+    AddEntity(photo);
+    
+    // ==========================================
+    // PLAYER
+    // ==========================================
+    
+    Player* hero = new Player("You", "A test subject trying to escape", 100);
+    hero->SetLocation(labStart);
     SetPlayer(hero);
     
     std::cout << "World initialized!\n\n";
+    std::cout << "===========================================\n";
+    std::cout << "  LABORATORY ESCAPE - ZORK GAME\n";
+    std::cout << "===========================================\n\n";
+    std::cout << "You wake up strapped to a gurney...\n";
+    std::cout << "Something terrible has happened here.\n";
+    std::cout << "You need to find a way out.\n\n";
 }
 
 // Run game loop
