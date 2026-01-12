@@ -1,4 +1,5 @@
 #include "world.h"
+#include "player.h" 
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -25,6 +26,7 @@ void World::AddEntity(Entity* entity) {
 // Set player
 void World::SetPlayer(Player* player) {
     this->player = player;
+    player->SetWorld(this);
     // Player is also an entity, add to entities list
     AddEntity(player);
 }
@@ -150,7 +152,7 @@ void World::Initialize() {
     AddEntity(corridorToContainment);
     AddEntity(containmentToCorridor);
     
-// ==========================================
+    // ==========================================
     // ITEMS - Starting Room
     // ==========================================
     
@@ -382,6 +384,20 @@ void World::ParseCommand(const std::string& input) {
     else if (command == "unequip" || command == "unwield") {
         player->Unequip();
     }
+    else if (command == "light" || command == "lights" || command == "switch") {
+        if (player->GetLocation()->GetName() == "Analysis Lab") {
+            if (!player->AreLightsOn()) {
+                player->SetLightOn(true);
+                std::cout << "You flip the light switch.\n";
+                std::cout << "The lights flicker on, revealing broken glass tubes all over the floor.\n";
+                std::cout << "Good thing you didn't step in there!\n";
+            } else {
+                std::cout << "The lights are already on.\n";
+            }
+        } else {
+            std::cout << "There's no light switch here.\n";
+        }
+    }
     // Help
     else if (command == "help" || command == "h" || command == "?") {
         ShowHelp();
@@ -428,7 +444,7 @@ void World::LookAround() {
 void World::ShowHelp() {
     std::cout << "\n=== Available Commands ===\n";
     std::cout << "Movement:\n";
-    std::cout << "  go <direction>, north/n, south/s, east/e, west/w\n";
+    std::cout << "  go <direction>, north/n, south/s, east/e, west/w, up/u, down/d\n";
     std::cout << "Actions:\n";
     std::cout << "  look/l - Look around\n";
     std::cout << "  take <item> - Pick up an item\n";
@@ -436,14 +452,24 @@ void World::ShowHelp() {
     std::cout << "  inventory/i - Show inventory\n";
     std::cout << "  equip <item> - Equip an item\n";
     std::cout << "  unequip - Unequip current item\n";
+    std::cout << "  light - Turn on lights (if available)\n";  // ← ADICIONAR
     std::cout << "Other:\n";
     std::cout << "  help/h - Show this help\n";
     std::cout << "  quit/q - Quit game\n";
 }
-
 // Update all entities
 void World::Update() {
     for (Entity* entity : entities) {
         entity->Update();
     }
+}
+
+void World::GameOver(const std::string& reason) {
+    std::cout << "\n===========================================\n";
+    std::cout << "           GAME OVER\n";
+    std::cout << "===========================================\n\n";
+    std::cout << reason << "\n\n";
+    std::cout << "You have died.\n\n";
+    
+    gameRunning = false;
 }
