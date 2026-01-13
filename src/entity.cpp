@@ -3,7 +3,7 @@
 
 //Constructor implementation
 Entity::Entity(const std::string& name, const std::string& description, EntityType type)
-    : name(name), description(description), type(type) {}
+    : type(type), name(name), description(description) {}
 
 //Destructor implementation
 Entity::~Entity() {
