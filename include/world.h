@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "room.h"
 #include "exit.h"
+#include "npc.h"
 #include "item.h"
 #include <vector>
 #include <string>
@@ -26,6 +27,7 @@ class Player;
     std::vector<Entity*> entities; // All entities in the world
     Player* player;                // The player character
     bool gameRunning;          // Is the game running?
+    NPC* monster;                  // Main NPC/monster in the game
 
     /**
      * Parse and execute a player command
@@ -92,6 +94,12 @@ public:
      * @param reason Reason for game over
      */
     void GameOver(const std::string& reason);
+    
+    /**
+     * Start combat with NPC
+     * @param npc Enemy to fight
+     */
+    void StartCombat(NPC* npc); 
 
 };
 
