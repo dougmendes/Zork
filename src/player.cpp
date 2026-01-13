@@ -211,14 +211,12 @@ bool Player::Move(Direction direction) {
     // ==========================================
     if (roomName == "Analysis Lab") {
         if (!lightOn) {
-            std::cout << "\n*** CRUNCH! ***\n";
-            std::cout << "You stepped on broken glass tubes in the dark!\n";
-            std::cout << "Unknown chemicals burn through your skin!\n";
-            
-            if (world != nullptr) {
-                world->GameOver("You were poisoned by unknown chemicals.");
-            }
-            return false;
+            // Warning but don't kill immediately - give chance to turn on lights
+            std::cout << "\n*** WARNING! ***\n";
+            std::cout << "It's pitch black! You can't see anything!\n";
+            std::cout << "You hear glass crunching under your feet...\n";
+            std::cout << "You need to turn on the lights immediately!\n";
+            std::cout << "Type 'light' before doing anything else!\n\n";
         } else {
             std::cout << "\nWith the lights on, you carefully avoid the broken glass.\n";
         }
