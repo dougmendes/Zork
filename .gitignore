@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Build artifacts
 *.o
 *.obj
@@ -31,3 +32,34 @@ Thumbs.db
 # Core dumps
 core
 core.*
+=======
+# Visual Studio
+.vs/
+x64/
+Debug/
+Release/
+*.user
+*.suo
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio cache/options
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+*.exe
+*.dll
+*.lib
+*.obj
+*.pdb
+>>>>>>> master
