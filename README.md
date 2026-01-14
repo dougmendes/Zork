@@ -33,9 +33,10 @@ You wake up on a gurney in a dimly lit laboratory. Your wrists and ankles were t
 ## 🎮 How to Play
 
 ### Starting the Game
-1. Download `Zork.exe` from the [Releases](https://github.com/dougmendes/Zork/releases) section
-2. Run `Zork.exe`
-3. The game starts in the **Starting Room**
+1. Download `Zork-v1.0-Windows.zip` from the [Releases](https://github.com/dougmendes/Zork/releases) section
+2. Extract `Zork.exe`
+3. Run the game
+4. The game starts in the **Starting Room**
 
 ### Basic Commands
 
