@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <limits>
 
 // Constructor
 World::World() 
@@ -482,6 +483,10 @@ void World::ParseCommand(const std::string& input) {
         std::cout << "===========================================\n";
         std::cout << "        YOU ESCAPED THE LABORATORY!\n";
         std::cout << "===========================================\n\n";
+
+        std::cout << "Press Enter to exit...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.get();
         
         gameRunning = false;
     } else {
@@ -748,6 +753,11 @@ void World::GameOver(const std::string& reason) {
     std::cout << "===========================================\n\n";
     std::cout << reason << "\n\n";
     std::cout << "You have died.\n\n";
-    
+
+    // Pause before closing
+    std::cout << "Press Enter to exit...";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cin.get();
+
     gameRunning = false;
 }
